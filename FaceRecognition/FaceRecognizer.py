@@ -6,11 +6,12 @@ import time
 
 class FaceRecognizer:
     def __init__(self):
+        #initialze models
         self.face_detector = cv2.dnn.readNetFromCaffe('model/deploy.prototxt', 'model/weights.caffemodel')
         self.face_recognizer = cv2.face.LBPHFaceRecognizer_create()
         self.names = []
     def find_faces(self, img):
-
+        #find face coordinates in image
         (img_height, img_width) = img.shape[:2]
         if img_height < 300 or img_width < 300:
             return
@@ -32,6 +33,7 @@ class FaceRecognizer:
         return face_boxes
 
     def get_training_images(self, path):
+        #loading training data for training
         image_paths = [os.path.join(path,f) for f in os.listdir(path)]     
         face_samples=[]
         ids = []
@@ -52,6 +54,7 @@ class FaceRecognizer:
         return face_samples,ids
 
     def train_recognizer(self):
+        #training recognizer with loaded images
         dirs = [os.path.join('data',f) for f in os.listdir('data')]
         for dir in dirs:
             faces, ids = self.get_training_images(dir)
@@ -62,6 +65,7 @@ class FaceRecognizer:
         self.face_recognizer.write('model/recognizer.yml')
     
     def capture_dataset_from_cam(self, username):
+        #caputring images from webcam
         cam = cv2.VideoCapture(0)
         try:
             os.mkdir("data/"+str(username))
@@ -78,6 +82,7 @@ class FaceRecognizer:
         cv2.destroyAllWindows()
 
     def live_prediction(self):
+        #finding and marking recognized faces from webcam view
         font = cv2.FONT_HERSHEY_SIMPLEX
         cam = cv2.VideoCapture(0)
         cam.set(3, 1280)
